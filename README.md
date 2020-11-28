@@ -29,7 +29,7 @@ public:
     void reset(T* ptr);
     void swap(SharedPtr& r);
     // возвращает количество объектов SharedPtr, которые ссылаются на тот же управляемый объект
-    auto use_count() const -> size_t;
+    auto useCount() const -> size_t;
 };
 ```
 
