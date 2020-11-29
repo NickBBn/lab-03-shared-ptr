@@ -90,14 +90,15 @@ class SharedPtr {
   }
   void swap(SharedPtr& r)
   {
-    T* tmpPointer = r.get();
+    T* tmpPointer (std::move(r.get()));
     std::atomic_uint* tmpNumberOfPointers = r.getNumberOfPointers();
-    r.pointer = pointer;
+    r.pointer = std::move(pointer);
     r.numberOfPointers = numberOfPointers;
-    pointer = tmpPointer;
+    pointer = std::move(tmpPointer);
     numberOfPointers = tmpNumberOfPointers;
   }
-  // возвращает количество объектов SharedPtr, которые ссылаются на тот же управляемый объект
+  // возвращает количество объектов SharedPtr,
+  // которые ссылаются на тот же управляемый объект
   auto useCount() const -> size_t
   {
     if (numberOfPointers) return *numberOfPointers;
@@ -114,8 +115,7 @@ class SharedPtr {
         numberOfPointers = nullptr;
         delete pointer;
         pointer = nullptr;
-      }
-      else
+      } else
         --(*numberOfPointers);
     }
   }
