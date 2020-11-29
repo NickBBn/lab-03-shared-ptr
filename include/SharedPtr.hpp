@@ -90,7 +90,7 @@ class SharedPtr {
   }
   void swap(SharedPtr& r)
   {
-    T* tmpPointer (std::move(r.get()));
+    T* tmpPointer(std::move(r.get()));
     std::atomic_uint* tmpNumberOfPointers = r.getNumberOfPointers();
     r.pointer = std::move(pointer);
     r.numberOfPointers = numberOfPointers;
@@ -115,8 +115,9 @@ class SharedPtr {
         numberOfPointers = nullptr;
         delete pointer;
         pointer = nullptr;
-      } else
+      } else {
         --(*numberOfPointers);
+      }
     }
   }
   auto getNumberOfPointers() const -> std::atomic_uint*
