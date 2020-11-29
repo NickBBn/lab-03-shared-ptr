@@ -1,28 +1,35 @@
 // Copyright 2020 Your Name <your_email>
 
 #include <gtest/gtest.h>
-#include "header.hpp"
 #include <utility>
+#include "SharedPtr.hpp"
 
-TEST(Example, EmptyTest) {
-  SharedPtr<int> b;
-  EXPECT_EQ(static_cast<bool>(b), false);
+TEST(CasuaMethodsTests, CountTest) {
+  auto ptr = new uint (15);
+  SharedPtr<uint> shared1 (ptr);
+  SharedPtr<uint> shared2 = shared1;
+  SharedPtr<uint> shared3;
+  EXPECT_EQ(shared1.useCount(), 2);
+  EXPECT_EQ(shared3.useCount(), 0);
 }
-TEST(Example, CountTest) {
-  int* ptr = new int (15);
-  SharedPtr<int> b (ptr);
-  size_t count = b.useCount();
-  EXPECT_EQ(count, 1);
+TEST(CasuaMethodsTests, GetTest) {
+  auto ptr = new uint(15);
+  SharedPtr<uint> shared1(ptr);
+  SharedPtr<uint> shared2 = shared1;
+  EXPECT_EQ(shared2.get(), ptr);
 }
-TEST(Example, GetTest) {
-  //char value = 'a';
+
+TEST(ConstructorTest, NullPointer) {
+  char* regularPtr = nullptr;
+  SharedPtr<char> charShared (regularPtr);
+  EXPECT_EQ(charShared.get(), nullptr);
+}
+TEST(ConstructorTest, RegularPointer) {
   char* firstptr = new char ('a');
   SharedPtr<char> charShared (firstptr);
-  char* ptr = charShared.get();
-  EXPECT_EQ(*ptr, 'a');
+  EXPECT_EQ(*charShared, 'a');
 }
-TEST(Example, FromLvalueTest) {
-  //int value = 23;
+TEST(ConstructorTest, Lvalue) {
   int* firstptr = new int (23);
   SharedPtr<int> intShared1 (firstptr);
   SharedPtr<int> intShared2 (intShared1);
@@ -32,32 +39,39 @@ TEST(Example, FromLvalueTest) {
   EXPECT_EQ(intShared1.useCount(), 2);
 }
 
-SharedPtr<int> returnObject(/*const SharedPtr<int> &ptr*/)
+SharedPtr<int> returnObject(const SharedPtr<int> &ptr)
 {
-  auto ptr = new int (300);
   SharedPtr<int> tmp (ptr);
-  *tmp = 350;
-  std::cout << "work pls" << std::endl;
+  return tmp;
+}
+SharedPtr<int> returnObject(int* ptr)
+{
+  SharedPtr<int> tmp (ptr);
   return tmp;
 }
 
-TEST(Example, FromRvalueTest) {
+TEST(ConstructorTest, Rvalue) {
   //int value = 23;
-  int *firstptr = new int (23);
-  SharedPtr<int> intShared1(firstptr);
+  int *regularPtr1 = new int (23);
+  int *regularPtr2 = new int (99);
+  SharedPtr<int> intShared1(regularPtr1);
   //SharedPtr<int> intShared2(std::move(intShared1));
-  SharedPtr<int> intShared2(returnObject());
-//  SharedPtr<int> intShared2(returnObject(/*intShared1*/));
+  //SharedPtr<int> intShared2(returnObject());
+  SharedPtr<int> intShared2 = returnObject(regularPtr2);
   int* ptr = intShared2.get();
   *ptr = 40;
   EXPECT_EQ((*intShared2.get()), 40);
-  EXPECT_EQ(intShared2.useCount(), 10);
+  EXPECT_EQ(intShared2.useCount(), 1);
 }
 
 struct ArrowExample
 { int a; };
 
-TEST(Example, OperatorTest) {
+TEST(OperatorsTest, OperatorBool) {
+  SharedPtr<int> b;
+  EXPECT_EQ(static_cast<bool>(b), false);
+}
+TEST(OperatorsTest, AsteriskAndArrow) {
   int* firstptr = new int (23);
   SharedPtr<int> intShared (firstptr);
   auto arrowptr = new ArrowExample;
@@ -68,7 +82,21 @@ TEST(Example, OperatorTest) {
   EXPECT_EQ(*intShared, *firstptr);
   EXPECT_EQ(arrowShared->a, arrowptr->a);
 }
-TEST(Example, ResetWithVoidTest) {
+TEST(OperatorsTest, EqualLvalue) {
+  auto regularPtr1 = new long (123);
+  SharedPtr<long> shared1 (regularPtr1);
+  //SharedPtr<long> shared1;
+  SharedPtr<long> shared2;
+  SharedPtr<long> shared3 = shared2 = shared1;
+  EXPECT_EQ(shared1.useCount(), 3);
+  EXPECT_EQ(shared2.useCount(), 3);
+  EXPECT_EQ(shared3.useCount(), 3);
+  EXPECT_EQ(shared1.get(), regularPtr1);
+  EXPECT_EQ(shared2.get(), regularPtr1);
+  EXPECT_EQ(shared3.get(), regularPtr1);
+}
+
+TEST(ResetTest, WithNoParams) {
   int* regularPtr = new int (23);
   SharedPtr<int> intShared1 (regularPtr);
   SharedPtr<int> intShared2 (intShared1);
@@ -77,8 +105,7 @@ TEST(Example, ResetWithVoidTest) {
   EXPECT_EQ(intShared3.useCount(), 2);
   EXPECT_EQ(intShared2.useCount(), 0);
 }
-
-TEST(Example, ResetWithPtrTest) {
+TEST(ResetTest, WithPointer) {
   auto regularPtr1 = new int (23);
   auto regularPtr2 = new int (45);
   SharedPtr<int> intShared1 (regularPtr1);
@@ -91,9 +118,7 @@ TEST(Example, ResetWithPtrTest) {
   EXPECT_EQ(intShared5.useCount(), 3);
   EXPECT_EQ(intShared5.get(), regularPtr2);
 }
-
-TEST(Example, VoidPointersTest) {
-  //int* regularPtr = new int (23);
+TEST(ResetTest, VoidSharedPtr) {
   SharedPtr<int> intShared1;
   SharedPtr<int> intShared2 (intShared1);
   SharedPtr<int> intShared3 (intShared2);
@@ -103,6 +128,29 @@ TEST(Example, VoidPointersTest) {
   EXPECT_EQ(intShared1.useCount(), 0);
 }
 
-//SharedPtr<int> &&rref = intShared1.returnObj();
-//std::cout << "rref is maken" << std::endl;
-//SharedPtr<int> intShared2(rref);
+TEST(SwapTest, Casual) {
+  auto regularPtr1 = new double (23.567);
+  auto regularPtr2 = new double (77.892);
+  SharedPtr<double> Shared1 (regularPtr1);
+  SharedPtr<double> Shared2 (regularPtr2);
+  SharedPtr<double> Shared3 (Shared2);
+  Shared1.swap(Shared2);
+  EXPECT_EQ(Shared1.useCount(), 2);
+  EXPECT_EQ(Shared2.useCount(), 1);
+  EXPECT_EQ(Shared3.useCount(), 2);
+  EXPECT_EQ(Shared1.get(), regularPtr2);
+  EXPECT_EQ(Shared2.get(), regularPtr1);
+}
+TEST(SwapTest, VoidSharedPtr) {
+//  auto regularPtr1 = new double (23.567);
+  auto regularPtr2 = new double (77.892);
+  SharedPtr<double> shared1;
+  SharedPtr<double> shared2 (regularPtr2);
+  SharedPtr<double> shared3 (shared2);
+  shared1.swap(shared2);
+  EXPECT_EQ(shared1.useCount(), 2);
+  EXPECT_EQ(shared2.useCount(), 0);
+  EXPECT_EQ(shared3.useCount(), 2);
+  EXPECT_EQ(shared1.get(), regularPtr2);
+  EXPECT_EQ(shared2.get(), nullptr);
+}

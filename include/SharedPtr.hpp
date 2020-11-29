@@ -16,30 +16,29 @@ class SharedPtr {
     std::cout << "Constructor void is called" << std::endl;
   }
   SharedPtr(T* ptr)
-      : pointer(nullptr)
+      : pointer(ptr)
       , numberOfPointers(nullptr)
   {
     std::cout << "Constructor T* is called" << std::endl;
-    pointer = ptr;
-    numberOfPointers = new std::atomic_uint;
-    ++(*numberOfPointers);
+    if (pointer){
+      numberOfPointers = new std::atomic_uint;
+      *numberOfPointers = 1;
+    } else {
+      numberOfPointers=nullptr;
+    }
   }
   SharedPtr(const SharedPtr& r)
-      : pointer(nullptr)
-      , numberOfPointers(nullptr)
+      : pointer(r.get())
+      , numberOfPointers(r.getNumberOfPointers())
   {
     std::cout << "Constructor const SharedPtr& r is called" << std::endl;
-    pointer = r.get();
-    numberOfPointers = r.getNumberOfPointers();
     if (numberOfPointers) ++(*numberOfPointers);
   }
   SharedPtr(SharedPtr&& r)
-      : pointer(nullptr)
-      , numberOfPointers(nullptr)
+      : pointer(r.get())
+      , numberOfPointers(r.getNumberOfPointers())
   {
     std::cout << "Constructor SharedPtr&& r is called " << std::endl;
-    pointer = r.get();
-    numberOfPointers = r.getNumberOfPointers();
     if (numberOfPointers) ++(*numberOfPointers);
   }
   ~SharedPtr()
@@ -47,8 +46,24 @@ class SharedPtr {
     std::cout << "Destructor called" << std::endl; //*numberOfPointers;
     destructorFunc();
   }
-//  auto operator=(const SharedPtr& r) -> SharedPtr&;
-//  auto operator=(SharedPtr&& r) -> SharedPtr&;
+
+  auto operator=(const SharedPtr& r) -> SharedPtr&
+  {
+    if (this!=&r){
+      pointer = r.get();
+      numberOfPointers = r.getNumberOfPointers();
+      if (numberOfPointers) ++(*numberOfPointers);
+    }
+    return *this;
+  }
+  auto operator=(SharedPtr&& r)  noexcept -> SharedPtr&
+  {
+    if (this!=&r){
+      pointer = r.get();
+      numberOfPointers = r.getNumberOfPointers();
+    }
+    return *this;
+  }
   // проверяет, указывает ли указатель на объект
   operator bool() const
   {
@@ -73,8 +88,12 @@ class SharedPtr {
   }
   void swap(SharedPtr& r)
   {
-    SharedPtr<int> tmp;
-
+    T* tmpPointer = r.get();
+    std::atomic_uint* tmpNumberOfPointers = r.getNumberOfPointers();
+    r.pointer = pointer;
+    r.numberOfPointers = numberOfPointers;
+    pointer = tmpPointer;
+    numberOfPointers = tmpNumberOfPointers;
   }
   // возвращает количество объектов SharedPtr, которые ссылаются на тот же управляемый объект
   auto useCount() const -> size_t
