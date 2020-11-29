@@ -1,10 +1,11 @@
 // Copyright 2020 Your Name <your_email>
 
-#ifndef INCLUDE_HEADER_HPP_
-#define INCLUDE_HEADER_HPP_
+#ifndef INCLUDE_SHAREDPTR_HPP_
+#define INCLUDE_SHAREDPTR_HPP_
 
 #include <atomic>
 #include <iostream>
+#include <utility>
 
 template <typename T>
 class SharedPtr {
@@ -15,7 +16,7 @@ class SharedPtr {
   {
     std::cout << "Constructor void is called" << std::endl;
   }
-  SharedPtr(T* ptr)
+  explicit SharedPtr(T* ptr)
       : pointer(ptr)
       , numberOfPointers(nullptr)
   {
@@ -24,7 +25,7 @@ class SharedPtr {
       numberOfPointers = new std::atomic_uint;
       *numberOfPointers = 1;
     } else {
-      numberOfPointers=nullptr;
+      numberOfPointers = nullptr;
     }
   }
   SharedPtr(const SharedPtr& r)
@@ -49,7 +50,7 @@ class SharedPtr {
 
   auto operator=(const SharedPtr& r) -> SharedPtr&
   {
-    if (this!=&r){
+    if (this != &r){
       pointer = r.get();
       numberOfPointers = r.getNumberOfPointers();
       if (numberOfPointers) ++(*numberOfPointers);
@@ -58,7 +59,7 @@ class SharedPtr {
   }
   auto operator=(SharedPtr&& r)  noexcept -> SharedPtr&
   {
-    if (this!=&r){
+    if (this != &r){
       pointer = r.get();
       numberOfPointers = r.getNumberOfPointers();
     }
@@ -68,7 +69,8 @@ class SharedPtr {
   operator bool() const
   {
     if (pointer) return true;
-    else return false;
+    else
+      return false;
   }
   auto operator*() const -> T& { return *pointer; }
   auto operator->() const -> T* { return pointer; }
@@ -83,7 +85,7 @@ class SharedPtr {
   {
     destructorFunc();
     pointer = ptr;
-    numberOfPointers= new std::atomic_uint;
+    numberOfPointers = new std::atomic_uint;
     *numberOfPointers = 1;
   }
   void swap(SharedPtr& r)
@@ -99,24 +101,30 @@ class SharedPtr {
   auto useCount() const -> size_t
   {
     if (numberOfPointers) return *numberOfPointers;
-    else return 0;
+    else
+      return 0;
   }
+
  private:
   void destructorFunc()
   {
     if (numberOfPointers){
-      if ((*numberOfPointers)==1){
+      if ((*numberOfPointers) == 1){
         delete numberOfPointers;
         numberOfPointers = nullptr;
         delete pointer;
         pointer = nullptr;
       }
-      else --(*numberOfPointers);
+      else
+        --(*numberOfPointers);
     }
   }
-  auto getNumberOfPointers() const -> std::atomic_uint*  { return numberOfPointers; }
+  auto getNumberOfPointers() const -> std::atomic_uint*
+  {
+    return numberOfPointers;
+  }
   T* pointer;
   std::atomic_uint* numberOfPointers;
 };
 
-#endif // INCLUDE_HEADER_HPP_
+#endif // INCLUDE_SHAREDPTR_HPP_
