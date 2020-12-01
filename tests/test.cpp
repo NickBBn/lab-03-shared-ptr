@@ -57,16 +57,16 @@ TEST(ConstructorTest, Rvalue) {
   std::cout << "SharedPtr<int> intShared1(regularPtr1);" << std::endl;
   SharedPtr<int> intShared1(regularPtr1);
   std::cout << "SharedPtr<int> intShared2(intShared1);" << std::endl;
-  SharedPtr<int> intShared2(intShared1);
-  std::cout << "SharedPtr<int> intShared3(std::move(intShared1));" << std::endl;
-  SharedPtr<int> intShared3(std::move(intShared1));
+  //SharedPtr<int> intShared2(intShared1);
+  //std::cout << "SharedPtr<int> intShared3(std::move(intShared1));" << std::endl;
+  SharedPtr<int> intShared2(std::move(intShared1));
   std::cout << "finished" << std::endl;
   //SharedPtr<int> intShared2(returnObject());
   //SharedPtr<int> intShared2 = returnObject(regularPtr2);
   //int* ptr = intShared2.get();
   //*ptr = 40;
-  EXPECT_EQ(intShared3.get(), regularPtr1);
-  EXPECT_EQ(intShared3.useCount(), 2);
+  EXPECT_EQ(intShared2.get(), regularPtr1);
+  EXPECT_EQ(intShared2.useCount(), 1);
 }
 
 struct ArrowExample
