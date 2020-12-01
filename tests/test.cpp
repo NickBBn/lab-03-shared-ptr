@@ -53,15 +53,16 @@ SharedPtr<int> returnObject(int* ptr)
 TEST(ConstructorTest, Rvalue) {
   //int value = 23;
   int *regularPtr1 = new int (23);
-  int *regularPtr2 = new int (99);
+  //int *regularPtr2 = new int (99);
   SharedPtr<int> intShared1(regularPtr1);
-  //SharedPtr<int> intShared2(std::move(intShared1));
+  SharedPtr<int> intShared2(intShared1);
+  SharedPtr<int> intShared3(std::move(intShared1));
   //SharedPtr<int> intShared2(returnObject());
-  SharedPtr<int> intShared2 = returnObject(regularPtr2);
+  //SharedPtr<int> intShared2 = returnObject(regularPtr2);
   int* ptr = intShared2.get();
   *ptr = 40;
-  EXPECT_EQ((*intShared2.get()), 40);
-  EXPECT_EQ(intShared2.useCount(), 1);
+  EXPECT_EQ(intShared3.get(), regularPtr1);
+  EXPECT_EQ(intShared3.useCount(), 2);
 }
 
 struct ArrowExample

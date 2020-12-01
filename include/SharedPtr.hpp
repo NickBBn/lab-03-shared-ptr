@@ -20,7 +20,7 @@ class SharedPtr {
       : pointer(ptr)
       , numberOfPointers(nullptr)
   {
-    std::cout << "Constructor T* is called" << std::endl;
+    //std::cout << "Constructor T* is called" << std::endl;
     if (pointer){
       numberOfPointers = new std::atomic_uint;
       *numberOfPointers = 1;
@@ -32,19 +32,18 @@ class SharedPtr {
       : pointer(r.get())
       , numberOfPointers(r.getNumberOfPointers())
   {
-    std::cout << "Constructor const SharedPtr& r is called" << std::endl;
+    //std::cout << "Constructor const SharedPtr& r is called" << std::endl;
     if (numberOfPointers) ++(*numberOfPointers);
   }
   SharedPtr(SharedPtr&& r)
       : pointer(r.get())
       , numberOfPointers(r.getNumberOfPointers())
   {
-    std::cout << "Constructor SharedPtr&& r is called " << std::endl;
-    if (numberOfPointers) ++(*numberOfPointers);
+    //std::cout << "Constructor SharedPtr&& r is called " << std::endl;
   }
   ~SharedPtr()
   {
-    std::cout << "Destructor called" << std::endl; //*numberOfPointers;
+    //std::cout << "Destructor called" << std::endl; //*numberOfPointers;
     destructorFunc();
   }
 
