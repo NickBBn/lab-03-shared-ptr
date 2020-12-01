@@ -58,7 +58,8 @@ TEST(ConstructorTest, Rvalue) {
   SharedPtr<int> intShared1(regularPtr1);
   std::cout << "SharedPtr<int> intShared2(intShared1);" << std::endl;
   //SharedPtr<int> intShared2(intShared1);
-  //std::cout << "SharedPtr<int> intShared3(std::move(intShared1));" << std::endl;
+  //std::cout << "SharedPtr<int> intShared3(std::move(intShared1));"
+  // << std::endl;
   SharedPtr<int> intShared2(std::move(intShared1));
   std::cout << "finished" << std::endl;
   //SharedPtr<int> intShared2(returnObject());
