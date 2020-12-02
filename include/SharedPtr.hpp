@@ -45,6 +45,8 @@ class SharedPtr {
   {
     //std::cout << "Destructor called" << std::endl; //*numberOfPointers;
     destructorFunc();
+    pointer = nullptr;
+    numberOfPointers = nullptr;
   }
 
   auto operator=(const SharedPtr& r) -> SharedPtr&

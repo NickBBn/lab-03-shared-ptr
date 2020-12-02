@@ -59,7 +59,7 @@ TEST(ConstructorTest, Rvalue) {
   std::cout << "SharedPtr<int> intShared2(intShared1);" << std::endl;
   //SharedPtr<int> intShared2(intShared1);
   //std::cout << "SharedPtr<int> intShared3(std::move(intShared1));"
-  // << std::endl;
+  //<< std::endl;
   SharedPtr<int> intShared2(std::move(intShared1));
   std::cout << "finished" << std::endl;
   //SharedPtr<int> intShared2(returnObject());
