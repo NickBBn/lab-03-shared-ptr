@@ -39,7 +39,9 @@ class SharedPtr {
       : pointer(r.get())
       , numberOfPointers(r.getNumberOfPointers())
   {
-    //std::cout << "Constructor SharedPtr&& r is called " << std::endl;
+    std::cout << "Constructor SharedPtr&& r is called " << std::endl;
+    r.numberOfPointers = nullptr;
+    r.pointer = nullptr;
   }
   ~SharedPtr()
   {
