@@ -51,21 +51,9 @@ SharedPtr<int> returnObject(int* ptr)
 }
 
 TEST(ConstructorTest, Rvalue) {
-  //int value = 23;
   int *regularPtr1 = new int (23);
-  //int *regularPtr2 = new int (99);
-  std::cout << "SharedPtr<int> intShared1(regularPtr1);" << std::endl;
   SharedPtr<int> intShared1(regularPtr1);
-  std::cout << "SharedPtr<int> intShared2(intShared1);" << std::endl;
-  //SharedPtr<int> intShared2(intShared1);
-  //std::cout << "SharedPtr<int> intShared3(std::move(intShared1));"
-  //<< std::endl;
   SharedPtr<int> intShared2(std::move(intShared1));
-  std::cout << "finished" << std::endl;
-  //SharedPtr<int> intShared2(returnObject());
-  //SharedPtr<int> intShared2 = returnObject(regularPtr2);
-  //int* ptr = intShared2.get();
-  //*ptr = 40;
   EXPECT_EQ(intShared2.get(), regularPtr1);
   EXPECT_EQ(intShared2.useCount(), 1);
 }
@@ -147,7 +135,6 @@ TEST(SwapTest, Casual) {
   EXPECT_EQ(Shared2.get(), regularPtr1);
 }
 TEST(SwapTest, VoidSharedPtr) {
-//  auto regularPtr1 = new double (23.567);
   auto regularPtr2 = new double (77.892);
   SharedPtr<double> shared1;
   SharedPtr<double> shared2(regularPtr2);
@@ -158,4 +145,8 @@ TEST(SwapTest, VoidSharedPtr) {
   EXPECT_EQ(shared3.useCount(), 2);
   EXPECT_EQ(shared1.get(), regularPtr2);
   EXPECT_EQ(shared2.get(), nullptr);
+}
+TEST(MovableTest, AssignAndConstruct) {
+  EXPECT_EQ(std::is_move_assignable<SharedPtr<int>>::value, true);
+  EXPECT_EQ(std::is_move_constructible<SharedPtr<int>>::value, true);
 }

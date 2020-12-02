@@ -20,7 +20,6 @@ class SharedPtr {
       : pointer(ptr)
       , numberOfPointers(nullptr)
   {
-    //std::cout << "Constructor T* is called" << std::endl;
     if (pointer){
       numberOfPointers = new std::atomic_uint;
       *numberOfPointers = 1;
@@ -32,20 +31,17 @@ class SharedPtr {
       : pointer(r.get())
       , numberOfPointers(r.getNumberOfPointers())
   {
-    //std::cout << "Constructor const SharedPtr& r is called" << std::endl;
     if (numberOfPointers) ++(*numberOfPointers);
   }
   SharedPtr(SharedPtr&& r)
       : pointer(r.get())
       , numberOfPointers(r.getNumberOfPointers())
   {
-    std::cout << "Constructor SharedPtr&& r is called " << std::endl;
     r.numberOfPointers = nullptr;
     r.pointer = nullptr;
   }
   ~SharedPtr()
   {
-    //std::cout << "Destructor called" << std::endl; //*numberOfPointers;
     destructorFunc();
     pointer = nullptr;
     numberOfPointers = nullptr;
@@ -100,8 +96,6 @@ class SharedPtr {
     pointer = std::move(tmpPointer);
     numberOfPointers = tmpNumberOfPointers;
   }
-  // возвращает количество объектов SharedPtr,
-  // которые ссылаются на тот же управляемый объект
   auto useCount() const -> size_t
   {
     if (numberOfPointers) return *numberOfPointers;
